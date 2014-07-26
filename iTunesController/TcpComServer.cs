@@ -85,6 +85,11 @@ namespace iTunesController
             
         }
 
+        public char GetEndOfPacketChar()
+        {
+            return (char)_endOfPacketChar;
+        }
+
         private void AcceptSocketCallback(IAsyncResult ar)
         {
             //if (_s != null)
@@ -155,8 +160,7 @@ namespace iTunesController
         {
             if (!_stopping)
             {
-                _nss.ProcessQueue();
-                _nss._packetsToSend.Enqueue(packet); 
+                _nss.SendPacket(packet);
             }
         }
 
@@ -290,6 +294,12 @@ namespace iTunesController
                 _requestStopWaitHandle = new EventWaitHandle(true, EventResetMode.ManualReset);
             }
 
+            public void SendPacket(string packet)
+            {
+                _packetsToSend.Enqueue(packet);
+                ProcessQueue();
+            }
+
             public void ProcessQueue()
             {
                 _ewh.Set();
@@ -340,6 +350,7 @@ namespace iTunesController
                     }
                     else
                     {
+                        //No more packets waiting, cause the thread to block until a new packet is signaled to be ready
                         _ewh.Reset();
                     }
 
@@ -352,7 +363,8 @@ namespace iTunesController
                 }
 
                 //done
-
+                //This is used to ensure that the RequestStop() method blocks until this therad, the sending thread, successfully completes.
+                //Ensures this thread completes before the method RequestStop() completes
                 _requestStopWaitHandle.Set();
 
             }

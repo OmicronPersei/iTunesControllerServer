@@ -296,6 +296,7 @@ namespace iTunesController
 
         private void SendTracks()
         {
+            //current, working version
             
             //send results to user
             for (int i = 1; i <= _songSearchResults.Count; ++i)
@@ -308,18 +309,27 @@ namespace iTunesController
             //done sending the search results, alert of the end of the search results
             _com.SendPacket("information searchresultsend");
             
+
+
+            //performance improvement attempt
+            //cannot implement because java's BufferedReader can only support 8kB worth of characters
             /*
             //send results to user
+
             for (int i = 1; i <= _songSearchResults.Count; ++i)
             {
-                string buff = "information searchresults \t";
-                buff = buff + (i - 1).ToString() + " " + _songSearchResults.get_ItemByPlayOrder(i).Artist + " - " + _songSearchResults.get_ItemByPlayOrder(i).Name;
-                buff = buff + '\t';
-                //
+                string buff = "information searchresults ";
+                buff = buff + (i - 1).ToString() + " " + 
+                    _songSearchResults.get_ItemByPlayOrder(i).Artist + " - " + 
+                    _songSearchResults.get_ItemByPlayOrder(i).Name + " - " + 
+                    _com.GetEndOfPacketChar();
+                //_com.SendPacket(buff);
             }
-            //_com.SendPacket("information searchresultsend");
-            _com.SendPacket(buff);
-            */
+
+            //done sending the search results, alert of the end of the search results
+            _com.SendPacket("information searchresultsend");
+             * */
+            
         }
 
         private void SendPlaylists()
