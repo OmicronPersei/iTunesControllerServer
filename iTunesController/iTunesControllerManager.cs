@@ -46,6 +46,7 @@ namespace iTunesController
             {
                 if (data == "welcome")
                 {
+                    Debug.Print("got just before welcome routine");
                     PushAllDataToClientRoutine();
                 }
             }
@@ -149,17 +150,43 @@ namespace iTunesController
 
         private void NotifyRating()
         {
-            _com.SendPacket("information rating " + (_iTunes.CurrentTrack.Rating).ToString());
+            try 
+            {	        
+	            int rating = _iTunes.CurrentTrack.Rating;
+                _com.SendPacket("information rating " + rating.ToString());
+            }
+            catch (Exception e)
+            {
+        		
+            }
         }
 
         private void NotifyTrackName()
         {
-            _com.SendPacket("information trackname " + _iTunes.CurrentTrack.Artist + " - " + _iTunes.CurrentTrack.Name);
+            try
+            {
+                string artist = _iTunes.CurrentTrack.Artist;
+                string name = _iTunes.CurrentTrack.Name;
+                _com.SendPacket("information trackname " + artist + " - " + name);
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         private void NotifyPTime()
         {
-            _com.SendPacket("information ptime " + _iTunes.CurrentTrack.Duration.ToString() + " " + _iTunes.PlayerPosition.ToString());
+            try
+            {
+                int duration = _iTunes.CurrentTrack.Duration;
+                int pos = _iTunes.PlayerPosition;
+                _com.SendPacket("information ptime " + duration.ToString() + " " + pos.ToString());
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         private void ParsePacket(string packet)
@@ -346,7 +373,7 @@ namespace iTunesController
 
 
             //}
-            IITPlaylist playlist;
+            //IITPlaylist playlist;
 
             for (int i = 1; i < _iTunes.LibrarySource.Playlists.Count; ++i)
             {
