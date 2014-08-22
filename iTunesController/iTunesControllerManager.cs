@@ -46,7 +46,7 @@ namespace iTunesController
             {
                 if (data == "welcome")
                 {
-                    ConnectionEstablishedRoutine();
+                    PushAllDataToClientRoutine();
                 }
             }
         }
@@ -115,7 +115,7 @@ namespace iTunesController
             _trackTimeTimer.Stop();
         }
 
-        private void ConnectionEstablishedRoutine()
+        private void PushAllDataToClientRoutine()
         {
             NotifyPlayPauseState();
             NotifyVolume(_iTunes.SoundVolume);
@@ -214,6 +214,11 @@ namespace iTunesController
                     {
                         int progress = Int32.Parse(p[2]);
                         _iTunes.PlayerPosition = progress;
+                    }
+                    else if (p[1] == "setplaylist")
+                    {
+                        _iTunes.LibrarySource.Playlists[Int32.Parse(p[2])].PlayFirstTrack();
+                        //_iTunes.LibrarySource.playlistID = 1;
                     }
                 }
                 else if (p[0] == "request")
@@ -341,6 +346,17 @@ namespace iTunesController
 
 
             //}
+            IITPlaylist playlist;
+
+            for (int i = 1; i < _iTunes.LibrarySource.Playlists.Count; ++i)
+            {
+                string buff = "information playlistsearchresults ";
+                buff += (i - 1).ToString() + " " + _iTunes.LibrarySource.Playlists[i].Name;
+                _com.SendPacket(buff);
+            }
+
+            _com.SendPacket("information playlistsearchresultsend");
+
 
         }
 

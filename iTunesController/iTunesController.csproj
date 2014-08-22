@@ -81,6 +81,12 @@
     <Compile Include="StartupManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\NetworkServerCommunicator\NetworkServerCommunicator\NetworkServerCommunicator.csproj">
+      <Project>{85F02201-F46D-41C2-BBAA-38090FA62642}</Project>
+      <Name>NetworkServerCommunicator</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="iTunesLib">
       <Guid>{9E93C96F-CF0D-43F6-8BA8-B807A3370712}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -89,12 +95,6 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\NetworkServerCommunicator\NetworkServerCommunicator\NetworkServerCommunicator.csproj">
-      <Project>{85F02201-F46D-41C2-BBAA-38090FA62642}</Project>
-      <Name>NetworkServerCommunicator</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
