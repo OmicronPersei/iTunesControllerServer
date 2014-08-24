@@ -20,6 +20,8 @@ namespace iTunesController
         public event ManagerConnectionStateChange ManagerConnectionStateChanged;
 
         private System.Timers.Timer _trackTimeTimer;
+
+        private bool _shuffleState;
         
 
         public iTunesControllerManager()
@@ -33,11 +35,16 @@ namespace iTunesController
 
             _trackTimeTimer = new System.Timers.Timer(1000.0);
             _trackTimeTimer.Elapsed += new ElapsedEventHandler(_trackTimeTimer_Elapsed);
+
+            _shuffleState = false;
         }
 
         private void _trackTimeTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             NotifyPTime();
+
+            if (_iTunes.CurrentPlaylist.Shuffle != _shuffleState)
+                NotifyAndUpdateShufflingState();
         }
 
         private void _com_ConnectionEvent(TcpComServer.ConnectionEventType connectionEvent, string data)
@@ -123,6 +130,24 @@ namespace iTunesController
             NotifyRating();
             NotifyTrackName();
             StartTrackTimer();
+            NotifyAndUpdateShufflingState();
+        }
+
+        private void NotifyAndUpdateShufflingState()
+        {
+            try
+            {
+                _shuffleState = _iTunes.CurrentPlaylist.Shuffle;
+
+                if (_iTunes.CurrentPlaylist.Shuffle)
+                    _com.SendPacket("information shufflestate on");
+                else
+                    _com.SendPacket("information shufflestate off");
+            }
+            catch (Exception)
+            {
+                
+            }
         }
 
         private void NotifyPlayPauseState()
@@ -236,6 +261,13 @@ namespace iTunesController
                     {
                         _iTunes.LibrarySource.Playlists[Int32.Parse(p[2])].PlayFirstTrack();
                         //_iTunes.LibrarySource.playlistID = 1;
+                    }
+                    else if (p[1] == "setshuffle")
+                    {
+                        if (p[2] == "on")
+                            _iTunes.CurrentPlaylist.Shuffle = true;
+                        else
+                            _iTunes.CurrentPlaylist.Shuffle = false;
                     }
                 }
                 else if (p[0] == "request")
