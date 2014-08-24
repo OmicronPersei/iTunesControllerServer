@@ -42,11 +42,11 @@ namespace iTunesController
 
         private void _com_ConnectionEvent(TcpComServer.ConnectionEventType connectionEvent, string data)
         {
-            if (connectionEvent == TcpComServer.ConnectionEventType.packetSent)
+            if (connectionEvent == TcpComServer.ConnectionEventType.PacketSent)
             {
                 if (data == "welcome")
                 {
-                    Debug.Print("got just before welcome routine");
+                    //Debug.Print("got just before welcome routine");
                     PushAllDataToClientRoutine();
                 }
             }
@@ -103,7 +103,7 @@ namespace iTunesController
 
         private void _iTunes_OnPlayerPlayEvent(object iTrack)
         {
-            NotifyPlaying();
+            NotifyPlayPauseState();
             NotifyRating();
             NotifyTrackName();
             StartTrackTimer();
@@ -112,7 +112,7 @@ namespace iTunesController
 
         private void _iTunes_OnPlayerStopEvent(object iTrack)
         {
-            NotifyPaused();
+            NotifyPlayPauseState();
             _trackTimeTimer.Stop();
         }
 
@@ -128,19 +128,9 @@ namespace iTunesController
         private void NotifyPlayPauseState()
         {
             if (_iTunes.PlayerState == ITPlayerState.ITPlayerStatePlaying)
-                NotifyPlaying();
+                _com.SendPacket("information playpausestate playing");
             else
-                NotifyPaused();
-        }
-
-        private void NotifyPlaying()
-        {
-            _com.SendPacket("information playpausestate playing");
-        }
-
-        private void NotifyPaused()
-        {
-            _com.SendPacket("information playpausestate paused");
+                _com.SendPacket("information playpausestate paused");
         }
 
         private void NotifyVolume(int newVolume)
@@ -268,11 +258,7 @@ namespace iTunesController
 
         public void Stop()
         {
-            _com.Stop("Form closed.");
-
-
-
-            
+            _com.Stop("Finished.");
         }
 
         private void InitiateSearchByText(string packet, bool feelingLucky)
@@ -331,15 +317,20 @@ namespace iTunesController
             //current, working version
             
             //send results to user
+            List<string> packets = new List<String>();
+
             for (int i = 1; i <= _songSearchResults.Count; ++i)
             {
                 string buff = "information searchresults ";
                 buff = buff + (i - 1).ToString() + " " + _songSearchResults.get_ItemByPlayOrder(i).Artist + " - " + _songSearchResults.get_ItemByPlayOrder(i).Name;
-                _com.SendPacket(buff);
+                packets.Add(buff);
             }
 
             //done sending the search results, alert of the end of the search results
-            _com.SendPacket("information searchresultsend");
+            packets.Add("information searchresultsend");
+
+            _com.SendPackets(packets);
+            
             
 
 
