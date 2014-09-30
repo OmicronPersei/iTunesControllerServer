@@ -5,49 +5,49 @@ using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
-namespace iTunesController
+
+class StartupManager
 {
-    class StartupManager
+    private string _keyName;
+
+    private string _executablePath;
+
+    private RegistryKey _rkApp;
+
+    public StartupManager()
     {
-        const string _keyName = "iTunesControllerShortcut";
+        _executablePath = Application.ExecutablePath;
+        _keyName = Application.ProductName;
 
-        private string _executablePath;
+        _rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
 
-        private RegistryKey _rkApp;
+    }
 
-        public StartupManager()
+    public void addToStartup()
+    {
+        if (!isAlreadyStartup())
         {
-            _executablePath = Application.ExecutablePath;
+            //Not added to the startup, let's add it
 
-            _rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            _rkApp.SetValue(_keyName, _executablePath);
 
         }
 
-        public void addToStartup()
+    }
+
+    public void removeFromStartup()
+    {
+        if (isAlreadyStartup())
         {
-            if (!isAlreadyStartup())
-            {
-                //Not added to the startup, let's add it
+            //Key exist, now lets delete it.
 
-                _rkApp.SetValue(_keyName, _executablePath);
-
-            }
-
-        }
-
-        public void removeFromStartup()
-        {
-            if (isAlreadyStartup())
-            {
-                //Key exist, now lets delete it.
-
-                _rkApp.DeleteValue(_keyName);
-            }
-        }
-
-        public Boolean isAlreadyStartup()
-        {
-            return (_rkApp.GetValue(_keyName) == null) ? false : true;
+            _rkApp.DeleteValue(_keyName);
         }
     }
+
+    public Boolean isAlreadyStartup()
+    {
+        return (_rkApp.GetValue(_keyName) == null) ? false : true;
+    }
 }
+
